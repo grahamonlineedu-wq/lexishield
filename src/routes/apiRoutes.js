@@ -5,7 +5,7 @@ const { initializePayment, verifyPayment } = require('../controllers/billingCont
 const { analysisLimiter } = require('../middleware/rateLimiter');
 
 // Rate-limited analysis endpoint
-router.post('/analyze', analysisLimiter, analyzeDocument);
+router.post('/analyze', analyzeDocument);
 
 // Billing routes
 router.post('/billing/checkout', initializePayment);

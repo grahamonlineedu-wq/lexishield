@@ -1,44 +1,66 @@
-const OpenAI = require('openai');
-const { SYSTEM_PROMPT } = require('../prompts/contractPrompt');
+const Groq = require('groq-sdk');
+const sql = require('../config/db');
+require('dotenv').config();
+
+const groq = new Groq({ 
+  apiKey: process.env.GROQ_API_KEY 
+});
 
 exports.analyzeDocument = async (req, res) => {
   try {
-    // Instantiate inside the function to ensure process.env is fully loaded
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    const { documentText } = req.body;
 
-    const { documentText, documentType } = req.body;
-
-    if (!documentText || documentText.trim().length < 50) {
-      return res.status(400).json({ error: 'Please provide valid document text (min 50 characters).' });
+    if (!documentText || documentText.trim().length < 20) {
+      return res.status(400).json({ error: 'Provide sufficient document text.' });
     }
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        { 
-          role: 'user', 
-          content: `Document Type: ${documentType || 'General Contract'}\n\nDocument Text:\n${documentText}` 
-        }
-      ],
-      temperature: 0.2,
+    const prompt = `Analyze this legal text and respond ONLY with a raw valid JSON object. Do not include markdown formatting or extra text.
+Structure:
+{
+  "risk_score": "Low",
+  "summary": "Brief summary",
+  "flags": ["Flag 1"],
+  "missing_clauses": ["Clause 1"]
+}
+
+Text:
+${documentText}`;
+
+    const completion = await groq.chat.completions.create({
+      messages: [{ role: 'user', content: prompt }],
+      model: 'openai/gpt-oss-120b',
+      max_tokens: 500
     });
 
-    const parsedReport = JSON.parse(completion.choices[0].message.content);
+    let content = completion.choices[0].message.content.trim();
+    content = content.replace(/```json|```/g, '').trim();
 
-    return res.status(200).json({
-      success: true,
-      data: parsedReport
-    });
+    const parsedData = JSON.parse(content);
+
+    if (sql) {
+      try {
+        await sql`
+          INSERT INTO contract_analyses (raw_text, risk_score, summary, flags, missing_clauses)
+          VALUES (
+            ${documentText}, 
+            ${parsedData.risk_score}, 
+            ${parsedData.summary}, 
+            ${JSON.stringify(parsedData.flags)}, 
+            ${JSON.stringify(parsedData.missing_clauses)}
+          )
+        `;
+      } catch (dbErr) {
+        console.error('DB Insert Warning:', dbErr.message);
+      }
+    }
+
+    return res.status(200).json({ status: 'success', data: parsedData });
 
   } catch (error) {
-    console.error('Analysis Error:', error.message);
+    console.error('API Error:', error.message);
     return res.status(500).json({ 
-      error: 'Failed to process document analysis.',
+      error: 'Failed to process document analysis.', 
       details: error.message 
     });
   }
 };
-
