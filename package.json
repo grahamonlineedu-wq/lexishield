@@ -2,10 +2,18 @@
   "name": "lexishield",
   "version": "1.0.0",
   "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "node --test"
+  },
   "dependencies": {
-    "@neondatabase/serverless": "^1.1.0",
-    "dotenv": "^16.6.1",
-    "express": "^4.19.2",
-    "groq-sdk": "^0.3.3"
+    "@neondatabase/serverless": "^0.10.4",
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.4.0",
+    "groq-sdk": "^0.15.0",
+    "helmet": "^8.0.0"
   }
 }
