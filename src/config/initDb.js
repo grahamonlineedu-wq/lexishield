@@ -1,41 +1,30 @@
 const sql = require('./db');
 
 async function initDb() {
-  if (!sql) {
-    console.warn('Database not configured. Set DATABASE_URL in your environment to enable persistence.');
-    return;
-  }
-
+  if (!sql) return;
   try {
+    // 1. Create contract_analyses table
     await sql`
       CREATE TABLE IF NOT EXISTS contract_analyses (
         id SERIAL PRIMARY KEY,
-        user_id VARCHAR(255),
-        document_preview TEXT,
-        document_hash VARCHAR(128),
+        raw_text TEXT NOT NULL,
         risk_score VARCHAR(50),
         summary TEXT,
         flags JSONB,
         missing_clauses JSONB,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
+    `;
 
-      CREATE TABLE IF NOT EXISTS payments (
+    // 2. Create users table for SaaS auth/credits
+    await sql`
+      CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
-        reference VARCHAR(255) UNIQUE,
-        user_id VARCHAR(255),
-        plan_type VARCHAR(100),
-        amount BIGINT,
-        currency VARCHAR(10),
-        status VARCHAR(50),
-        metadata JSONB,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        api_key VARCHAR(100) UNIQUE NOT NULL,
+        subscription_status VARCHAR(50) DEFAULT 'free',
+        credits_remaining INT DEFAULT 3,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-
-      CREATE TABLE IF NOT EXISTS user_credits (
-        user_id VARCHAR(255) PRIMARY KEY,
-        credits INTEGER DEFAULT 0,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `;
 

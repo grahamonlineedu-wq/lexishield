@@ -4,16 +4,15 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js",
-    "test": "node --test"
+    "dev": "nodemon index.js"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",
-    "axios": "^1.7.7",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "express-rate-limit": "^7.4.0",
-    "groq-sdk": "^0.15.0",
-    "helmet": "^8.0.0"
+    "groq-sdk": "^0.15.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
   }
 }
