@@ -1,18 +1,57 @@
 {
   "name": "lexishield",
   "version": "1.0.0",
+  "description": "LexiShield: AI-powered contract risk analysis API using Groq. Secure-by-default Express app for legal document review.",
   "main": "index.js",
+  "types": "index.d.ts",
+  "author": "Graham <grahamonlineedu-wq>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/grahamonlineedu-wq/lexishield.git"
+  },
+  "bugs": {
+    "url": "https://github.com/grahamonlineedu-wq/lexishield/issues"
+  },
+  "homepage": "https://github.com/grahamonlineedu-wq/lexishield#readme",
+  "keywords": [
+    "legal-tech",
+    "contract-analysis",
+    "ai",
+    "groq",
+    "risk-analysis",
+    "express",
+    "neon",
+    "saas",
+    "legal-ai"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "test": "jest",
+    "lint": "eslint ."
   },
+  "files": [
+    "index.js",
+    "src",
+    "public",
+    "README.md",
+    "LICENSE"
+  ],
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "groq-sdk": "^0.15.0"
+    "express-rate-limit": "^8.7.2",
+    "groq-sdk": "^0.15.0",
+    "helmet": "^8.3.0"
   },
   "devDependencies": {
+    "eslint": "^9.0.0",
+    "jest": "^29.7.0",
     "nodemon": "^3.1.14"
   }
 }
